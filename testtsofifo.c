@@ -3,19 +3,22 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
+#include <unistd.h>
 
-//#define BUFFER_LENGTH 256               ///< The buffer length (crude but fine)
-//static char receive[BUFFER_LENGTH];     ///< The receive buffer from the LKM
+#define BUFFER_LENGTH 4096               ///< The buffer length (crude but fine)
+static char receive[BUFFER_LENGTH];     ///< The receive buffer from the LKM
 
 int main(){
-   /*int ret, fd;
+
+   int ret, fd;
    char stringToSend[BUFFER_LENGTH];
    printf("Starting device test code example...\n");
-   fd = open("/dev/ebbchar", O_RDWR);             // Open the device with read/write access
+   fd = open("/dev/tsofifo5", O_RDWR);             // Open the device with read/write access
    if (fd < 0){
       perror("Failed to open the device...");
       return errno;
    }
+
    printf("Type in a short string to send to the kernel module:\n");
    scanf("%[^\n]%*c", stringToSend);                // Read in a string (with spaces)
    printf("Writing message to the device [%s].\n", stringToSend);
@@ -35,6 +38,6 @@ int main(){
       return errno;
    }
    printf("The received message is: [%s]\n", receive);
-   printf("End of the program\n");*/
+   printf("End of the program\n");
    return 0;
 }

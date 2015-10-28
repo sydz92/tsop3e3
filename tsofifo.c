@@ -19,8 +19,24 @@ MODULE_VERSION("1.0");
 int i;
 static int    majorNumber;
 static char   message[4096];
-static short  head = 0;
 static short  top= 0;
+
+//dev1
+static char   d1Buff[4096];
+static short  d1Head = 0;
+static short  d1Top= 0;
+//dev2
+static char   d2Buff[4096];
+static short  d2Head = 0;
+static short  d2Top= 0;
+//dev3
+static char   d3Buff[4096];
+static short  d3Head = 0;
+static short  d3Top= 0;
+//dev4
+static char   d4Buff[4096];
+static short  d4Head = 0;
+static short  d4Top= 0;
 
 //Devices structs
 static struct class*  tsofifoClass  = NULL;
@@ -41,6 +57,7 @@ static struct file_operations fops =
    .release = dev_release,
 };
 
+//INICIALIZACION DEL MODULO
 static int __init tsofifo_init(void){
    printk(KERN_INFO "TSOFIFO: Inicializando el TSOFIFO LKM\n");
 
@@ -76,6 +93,7 @@ static int __init tsofifo_init(void){
    return 0;
 }
 
+//LIBERER RECURSOS
 static void __exit tsofifo_exit(void){
    for(i=0;i<8;i++)
    {
@@ -89,34 +107,220 @@ static void __exit tsofifo_exit(void){
 
 static int dev_open(struct inode *inodep, struct file *filep){
  
-   printk(KERN_INFO "EBBChar: Device has been opened");
+   if (MINOR(inodep->i_rdev) == 0)
+   //tsofifo0
+   {
+
+      printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 1)
+   //tsofifo1
+   {
+
+      printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 2)
+   //tsofifo2
+   {
+
+      printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 3)
+   //tsofifo3
+   {
+
+      printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 4)
+   //tsofifo4
+   {
+
+      printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 5)
+   //tsofifo5
+   {
+
+      printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 6)
+   //tsofifo6
+   {
+
+      printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 7)
+   //tsofifo7
+   {
+
+      printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   }
+
    return 0;
 }
 
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *offset){
+   
+//EXAMPLE
    int error_count = 0;
    // copy_to_user has the format ( * to, *from, size) and returns 0 on success
    error_count = copy_to_user(buffer, message, top);
 
-   if (error_count==0){            // if true then have success
+   if (error_count==0)
+   {// if true then have success
       printk(KERN_INFO "EBBChar: Sent %d characters to the user\n", top);
       return (top=0);  // clear the position to the start and return 0
    }
-   else {
+   else 
+   {
       printk(KERN_INFO "EBBChar: Failed to send %d characters to the user\n", error_count);
       return -EFAULT;              // Failed -- return a bad address message (i.e. -14)
    }
+
+//CODIGO
+   if (MINOR(inodep->i_rdev) == 0)
+   //tsofifo0
+   {
+      printk(KERN_ALERT "El dispositivo tsofifo%d es de solo escritura\n");
+      return −EINVAL;
+
+   } else if (MINOR(inodep->i_rdev) == 1)
+   //tsofifo1
+   {
+      printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   
+   } else if (MINOR(inodep->i_rdev) == 2)
+   //tsofifo2
+   {
+      printk(KERN_ALERT "El dispositivo tsofifo%d es de solo escritura\n");
+      return −EINVAL;
+
+   } else if (MINOR(inodep->i_rdev) == 3)
+   //tsofifo3
+   {
+      printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+
+   } else if (MINOR(inodep->i_rdev) == 4)
+   //tsofifo4
+   {
+      printk(KERN_ALERT "El dispositivo tsofifo%d es de solo escritura\n");
+      return −EINVAL;
+
+   } else if (MINOR(inodep->i_rdev) == 5)
+   //tsofifo5
+   {
+      printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+
+   } else if (MINOR(inodep->i_rdev) == 6)
+   //tsofifo6
+   {
+      printk(KERN_ALERT "El dispositivo tsofifo%d es de solo escritura\n");
+      return −EINVAL;
+
+   } else if (MINOR(inodep->i_rdev) == 7)
+   //tsofifo7
+   {
+      printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+
+   }
+
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset){
+
+//EXAMPLE
    sprintf(message, "%s(%d letters)", buffer, len);   // appending received string with its length
    top = strlen(message);                 // store the length of the stored message
    printk(KERN_INFO "EBBChar: Received %d characters from the user\n", len);
    return len;
+
+//CODIGO
+   if (MINOR(inodep->i_rdev) == 0)
+   //tsofifo0
+   {
+      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+
+   } else if (MINOR(inodep->i_rdev) == 1)
+   //tsofifo1
+   {
+      printk(KERN_ALERT "El dispositivo tsofifo%d es de solo lectura\n");
+      return −EINVAL;
+   
+   } else if (MINOR(inodep->i_rdev) == 2)
+   //tsofifo2
+   {
+      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+
+   } else if (MINOR(inodep->i_rdev) == 3)
+   //tsofifo3
+   {
+      printk(KERN_ALERT "El dispositivo tsofifo%d es de solo lectura\n");
+      return −EINVAL;
+
+   } else if (MINOR(inodep->i_rdev) == 4)
+   //tsofifo4
+   {
+      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+
+   } else if (MINOR(inodep->i_rdev) == 5)
+   //tsofifo5
+   {
+      printk(KERN_ALERT "El dispositivo tsofifo%d es de solo lectura\n");
+      return −EINVAL;
+
+   } else if (MINOR(inodep->i_rdev) == 6)
+   //tsofifo6
+   {
+      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+
+   } else if (MINOR(inodep->i_rdev) == 7)
+   //tsofifo7
+   {
+      printk(KERN_ALERT "El dispositivo tsofifo%d es de solo lectura\n");
+      return −EINVAL;
+
+   }
+
 }
 
+// RELEASE
 static int dev_release(struct inode *inodep, struct file *filep){
-   printk(KERN_INFO "EBBChar: Device successfully closed\n");
+   
+      if (MINOR(inodep->i_rdev) == 0)
+   //tsofifo0
+   {
+
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 1)
+   //tsofifo1
+   {
+
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 2)
+   //tsofifo2
+   {
+
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 3)
+   //tsofifo3
+   {
+
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 4)
+   //tsofifo4
+   {
+
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 5)
+   //tsofifo5
+   {
+
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 6)
+   //tsofifo6
+   {
+
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   } else if (MINOR(inodep->i_rdev) == 7)
+   //tsofifo7
+   {
+
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", MINOR(inodep->i_rdev));
+   }
+   
    return 0;
 }
 
