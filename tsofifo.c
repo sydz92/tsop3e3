@@ -53,7 +53,7 @@ static struct semaphore d3SemTSOs;
 static char   d4Buff[4096];
 static short  d4Head = 0;
 static short  d4Len= 0;
-static short  tsofifo5= 0;
+static short  tsofifo6= 0;
 static short  tsofifo7= 0;
 static struct semaphore d4SemBuff;
 static struct semaphore d4SemBuffEmpty;
@@ -342,7 +342,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
                   up(&d1SemBuffFull);
                //reacomoadar buffer
                d1Len -= to_read;
-               for (i=0, i < d1Len, i++)
+               for (i=0;i < d1Len;i++)
                {
                   d1Buff[i] = d1Buff[to_read+i];
                }
@@ -411,7 +411,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
                   up(&d2SemBuffFull);
                //reacomoadar buffer
                d2Len -= to_read;
-               for (i=0, i < d2Len, i++)
+               for (i=0;i < d2Len;i++)
                {
                   d2Buff[i] = d2Buff[to_read+i];
                }
@@ -480,7 +480,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
                   up(&d3SemBuffFull);
                //reacomoadar buffer
                d3Len -= to_read;
-               for (i=0, i < d3Len, i++)
+               for (i=0;i < d3Len;i++)
                {
                   d3Buff[i] = d3Buff[to_read+i];
                }
@@ -549,7 +549,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
                   up(&d4SemBuffFull);
                //reacomoadar buffer
                d4Len -= to_read;
-               for (i=0, i < d4Len, i++)
+               for (i=0;i < d4Len;i++)
                {
                   d4Buff[i] = d4Buff[to_read+i];
                }
@@ -592,7 +592,7 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset){
 
 //CODIGO
-   int to_Write;
+   int to_write;
    int minor = MINOR(filep->f_inode->i_rdev);
 
    if (minor == 0)
@@ -613,7 +613,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
                to_write = len;
             }
             //COPIAR AL BUFFER
-            for (i = 0, i < to_write, i++)
+            for (i = 0;i < to_write;i++)
             {
                d1Buff[i+d1Len] = buffer[i];
             }
@@ -659,7 +659,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
                to_write = len;
             }
             //COPIAR AL BUFFER
-            for (i = 0, i < to_write, i++)
+            for (i = 0;i < to_write;i++)
             {
                d2Buff[i+d2Len] = buffer[i];
             }
@@ -705,7 +705,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
                to_write = len;
             }
             //COPIAR AL BUFFER
-            for (i = 0, i < to_write, i++)
+            for (i = 0;i < to_write;i++)
             {
                d3Buff[i+d3Len] = buffer[i];
             }
@@ -751,7 +751,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
                to_write = len;
             }
             //COPIAR AL BUFFER
-            for (i = 0, i < to_write, i++)
+            for (i = 0;i < to_write;i++)
             {
                d4Buff[i+d4Len] = buffer[i];
             }
