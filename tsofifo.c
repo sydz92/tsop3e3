@@ -4,6 +4,7 @@
 #include <linux/kernel.h>
 #include <linux/fs.h>
 #include <asm/uaccess.h>
+#include <linux/semaphore.h>
 
 // Nombre y clase de dispositivo
 #define  DEVICE_NAME "tsofifo"
@@ -299,34 +300,45 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    {
       printk(KERN_INFO "TSOFIFO%d: read en dispositivo", minor);
       
-      if (d2Len > 0)
-      {
-         if (len > d2Len)
-         {
-            to_read = d2Len;
+      down(&d1SemBuff);
+      if (d1Len > 0)
+      {//Hay cosas en el buffer
+         if (len > d1Len)
+         {//leer todo el buffer
+            to_read = d1Len;
          }
          else
-         {
+         {//leer len caraceres
             to_read = len;
          }
          //COPIAR AL USER SPACE
          error_count = 0;
-         error_count = copy_to_user(buffer, d2Buff, to_read);
+         error_count = copy_to_user(buffer, d1Buff, to_read);
          //MANEJO DE ERROR
          if (error_count==0)
          {//success
-            printk(KERN_INFO "TSOFIFO%d: %d caracteres leidos\n", d2Top, minor);
-            return (d2Top=0);
+            //reacomoadar buffer
+            d1Len -= to_read;
+            for (i=0, i < d1Len, i++)
+            {
+               d1Buff[i] = d1Buff[to_read+i];
+            }
+
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres leidos\n", to_read, minor);
+            up(&d1SemBuff);
+            return (to_read);
          }
          else 
          {//error
             printk(KERN_INFO "TSOFIFO%d: Fallo al leer %d caracteres\n", error_count, minor);
+            up(&d1SemBuff);
             return -EFAULT;
          }
       }
       else
-      {
-         printk(KERN_INFO "TSOFIFO%d: buffer vacio", d2Top, minor);
+      {//Buffer vacio
+         printk(KERN_INFO "TSOFIFO%d: buffer vacio", minor);
+         up(&d1SemBuff);
          return 0;
       }
    
@@ -341,19 +353,46 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    {
       printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", minor);
 
-      //COPIAR AL USER SPACE
-      error_count = 0;
-      error_count = copy_to_user(buffer, d2Buff, d2Top);
-      //MANEJO DE ERROR
-      if (error_count==0)
-      {//success
-         printk(KERN_INFO "TSOFIFO: %d caracteres leidos\n", d2Top);
-         return (d2Top=0);
+      down(&d2SemBuff);
+      if (d2Len > 0)
+      {//Hay cosas en el buffer
+         if (len > d2Len)
+         {//leer todo el buffer
+            to_read = d2Len;
+         }
+         else
+         {//leer len caraceres
+            to_read = len;
+         }
+         //COPIAR AL USER SPACE
+         error_count = 0;
+         error_count = copy_to_user(buffer, d2Buff, to_read);
+         //MANEJO DE ERROR
+         if (error_count==0)
+         {//success
+            //reacomoadar buffer
+            d2Len -= to_read;
+            for (i=0, i < d2Len, i++)
+            {
+               d2Buff[i] = d2Buff[to_read+i];
+            }
+
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres leidos\n", to_read, minor);
+            up(&d2SemBuff);
+            return (to_read);
+         }
+         else 
+         {//error
+            printk(KERN_INFO "TSOFIFO%d: Fallo al leer %d caracteres\n", error_count, minor);
+            up(&d2SemBuff);
+            return -EFAULT;
+         }
       }
-      else 
-      {//error
-         printk(KERN_INFO "TSOFIFO: Fallo al leer %d caracteres\n", error_count);
-         return -EFAULT;
+      else
+      {//Buffer vacio
+         printk(KERN_INFO "TSOFIFO%d: buffer vacio", minor);
+         up(&d2SemBuff);
+         return 0;
       }
 
    } else if (minor == 4)
@@ -367,19 +406,46 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    {
       printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", minor);
 
-      //COPIAR AL USER SPACE
-      error_count = 0;
-      error_count = copy_to_user(buffer, d3Buff, d3Top);
-      //MANEJO DE ERROR
-      if (error_count==0)
-      {//success
-         printk(KERN_INFO "TSOFIFO: %d caracteres leidos\n", d3Top);
-         return (d3Top=0);
+      down(&d3SemBuff);
+      if (d3Len > 0)
+      {//Hay cosas en el buffer
+         if (len > d3Len)
+         {//leer todo el buffer
+            to_read = d3Len;
+         }
+         else
+         {//leer len caraceres
+            to_read = len;
+         }
+         //COPIAR AL USER SPACE
+         error_count = 0;
+         error_count = copy_to_user(buffer, d3Buff, to_read);
+         //MANEJO DE ERROR
+         if (error_count==0)
+         {//success
+            //reacomoadar buffer
+            d3Len -= to_read;
+            for (i=0, i < d3Len, i++)
+            {
+               d3Buff[i] = d3Buff[to_read+i];
+            }
+
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres leidos\n", to_read, minor);
+            up(&d3SemBuff);
+            return (to_read);
+         }
+         else 
+         {//error
+            printk(KERN_INFO "TSOFIFO%d: Fallo al leer %d caracteres\n", error_count, minor);
+            up(&d3SemBuff);
+            return -EFAULT;
+         }
       }
-      else 
-      {//error
-         printk(KERN_INFO "TSOFIFO: Fallo al leer %d caracteres\n", error_count);
-         return -EFAULT;
+      else
+      {//Buffer vacio
+         printk(KERN_INFO "TSOFIFO%d: buffer vacio", minor);
+         up(&d3SemBuff);
+         return 0;
       }
 
    } else if (minor == 6)
@@ -393,19 +459,46 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    {
       printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", minor);
 
-      //COPIAR AL USER SPACE
-      error_count = 0;
-      error_count = copy_to_user(buffer, d4Buff, d4Top);
-      //MANEJO DE ERROR
-      if (error_count==0)
-      {//success
-         printk(KERN_INFO "TSOFIFO: %d caracteres leidos\n", d4Top);
-         return (d4Top=0);
+      down(&d4SemBuff);
+      if (d4Len > 0)
+      {//Hay cosas en el buffer
+         if (len > d4Len)
+         {//leer todo el buffer
+            to_read = d4Len;
+         }
+         else
+         {//leer len caraceres
+            to_read = len;
+         }
+         //COPIAR AL USER SPACE
+         error_count = 0;
+         error_count = copy_to_user(buffer, d4Buff, to_read);
+         //MANEJO DE ERROR
+         if (error_count==0)
+         {//success
+            //reacomoadar buffer
+            d4Len -= to_read;
+            for (i=0, i < d4Len, i++)
+            {
+               d4Buff[i] = d4Buff[to_read+i];
+            }
+
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres leidos\n", to_read, minor);
+            up(&d4SemBuff);
+            return (to_read);
+         }
+         else 
+         {//error
+            printk(KERN_INFO "TSOFIFO%d: Fallo al leer %d caracteres\n", error_count, minor);
+            up(&d4SemBuff);
+            return -EFAULT;
+         }
       }
-      else 
-      {//error
-         printk(KERN_INFO "TSOFIFO: Fallo al leer %d caracteres\n", error_count);
-         return -EFAULT;
+      else
+      {//Buffer vacio
+         printk(KERN_INFO "TSOFIFO%d: buffer vacio", minor);
+         up(&d4SemBuff);
+         return 0;
       }
 
    }
@@ -416,18 +509,42 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset){
 
 //CODIGO
+   int to_Write;
    int minor = MINOR(filep->f_inode->i_rdev);
 
    if (minor == 0)
    //tsofifo0
    {
-      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO%d: write en dispositivo", minor);
 
-      //COPIAR AL BUFFER
-      sprintf(d1Buff, "%s", buffer);  
-      d1Top = strlen(d1Buff);                 
-      printk(KERN_INFO "TSOFIFO: %d caracteers recividos\n", len);
-      return len;
+      down(&d1SemBuff);
+      if (d1Len < 4096)
+      {//hay espacio en el buffer 
+         if (len> (4096 - d1Len))
+         {//escribir lo que queda de baffer
+            to_write = 4096 - d1Len;
+         }
+         else
+         {//esribir todo
+            to_write = len;
+         }
+         //COPIAR AL BUFFER
+         for (i = 0, i < to_write, i++)
+         {
+            d1Buff[i+d1Len] = buffer[i];
+         }
+         d1Len+= to_write;
+
+         printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos", minor, to_write);
+         up(&d1SemBuff);
+         return to_write;
+      }
+      else 
+      {//el buffer esta lleno
+         printk(KERN_INFO "TSOFIFO%d: buffer lleno", minor);
+         up(&d1SemBuff);
+         return 0;
+      }
 
    } else if (minor == 1)
    //tsofifo1
@@ -440,11 +557,34 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    {
       printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", minor);
 
-      //COPIAR AL BUFFER
-      sprintf(d2Buff, "%s", buffer);  
-      d2Top = strlen(d2Buff);                 
-      printk(KERN_INFO "TSOFIFO: %d caracteers recividos\n", len);
-      return len;
+      down(&d2SemBuff);
+      if (d2Len < 4096)
+      {//hay espacio en el buffer 
+         if (len> (4096 - d2Len))
+         {//escribir lo que queda de baffer
+            to_write = 4096 - d2Len;
+         }
+         else
+         {//esribir todo
+            to_write = len;
+         }
+         //COPIAR AL BUFFER
+         for (i = 0, i < to_write, i++)
+         {
+            d2Buff[i+d2Len] = buffer[i];
+         }
+         d2Len+= to_write;
+
+         printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos", minor, to_write);
+         up(&d2SemBuff);
+         return to_write;
+      }
+      else 
+      {//el buffer esta lleno
+         printk(KERN_INFO "TSOFIFO%d: buffer lleno", minor);
+         up(&d2SemBuff);
+         return 0;
+      }
 
    } else if (minor == 3)
    //tsofifo3
@@ -457,11 +597,34 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    {
       printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", minor);
 
-      //COPIAR AL BUFFER
-      sprintf(d3Buff, "%s", buffer);  
-      d3Top = strlen(d3Buff);                 
-      printk(KERN_INFO "TSOFIFO: %d caracteers recividos\n", len);
-      return len;
+      down(&d3SemBuff);
+      if (d3Len < 4096)
+      {//hay espacio en el buffer 
+         if (len> (4096 - d3Len))
+         {//escribir lo que queda de baffer
+            to_write = 4096 - d3Len;
+         }
+         else
+         {//esribir todo
+            to_write = len;
+         }
+         //COPIAR AL BUFFER
+         for (i = 0, i < to_write, i++)
+         {
+            d3Buff[i+d3Len] = buffer[i];
+         }
+         d3Len+= to_write;
+
+         printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos", minor, to_write);
+         up(&d3SemBuff);
+         return to_write;
+      }
+      else 
+      {//el buffer esta lleno
+         printk(KERN_INFO "TSOFIFO%d: buffer lleno", minor);
+         up(&d3SemBuff);
+         return 0;
+      }
 
    } else if (minor == 5)
    //tsofifo5
@@ -474,11 +637,34 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    {
       printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", minor);
 
-      //COPIAR AL BUFFER
-      sprintf(d4Buff, "%s", buffer);  
-      d4Top = strlen(d4Buff);                 
-      printk(KERN_INFO "TSOFIFO: %d caracteers recividos\n", len);
-      return len;
+      down(&d4SemBuff);
+      if (d4Len < 4096)
+      {//hay espacio en el buffer 
+         if (len> (4096 - d4Len))
+         {//escribir lo que queda de baffer
+            to_write = 4096 - d4Len;
+         }
+         else
+         {//esribir todo
+            to_write = len;
+         }
+         //COPIAR AL BUFFER
+         for (i = 0, i < to_write, i++)
+         {
+            d4Buff[i+d4Len] = buffer[i];
+         }
+         d4Len+= to_write;
+
+         printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos", minor, to_write);
+         up(&d4SemBuff);
+         return to_write;
+      }
+      else 
+      {//el buffer esta lleno
+         printk(KERN_INFO "TSOFIFO%d: buffer lleno", minor);
+         up(&d4SemBuff);
+         return 0;
+      }
 
    } else if (minor == 7)
    //tsofifo7
