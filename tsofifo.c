@@ -21,19 +21,35 @@ static int    majorNumber;
 //dev1
 static char   d1Buff[4096];
 static short  d1Head = 0;
-static short  d1Top= 0;
+static short  d1Len= 0;
+static struct semaphore d1SemBuff;
+static short  tsofifo0= 0;
+static short  tsofifo1= 0;
+static struct semaphore d1SemTSOs;
 //dev2
 static char   d2Buff[4096];
 static short  d2Head = 0;
-static short  d2Top= 0;
+static short  d2Len= 0;
+static struct semaphore d2SemBuff;
+static short  tsofifo2= 0;
+static short  tsofifo3= 0;
+static struct semaphore d2SemTSOs;
 //dev3
 static char   d3Buff[4096];
 static short  d3Head = 0;
-static short  d3Top= 0;
+static short  d3Len= 0;
+static struct semaphore d3SemBuff;
+static short  tsofifo4= 0;
+static short  tsofifo5= 0;
+static struct semaphore d3SemTSOs;
 //dev4
 static char   d4Buff[4096];
 static short  d4Head = 0;
-static short  d4Top= 0;
+static short  d4Len= 0;
+static struct semaphore d4SemBuff;
+static short  tsofifo5= 0;
+static short  tsofifo7= 0;
+static struct semaphore d4SemTSOs;
 
 //Devices structs
 static struct class*  tsofifoClass  = NULL;
@@ -57,6 +73,16 @@ static struct file_operations fops =
 //INICIALIZACION DEL MODULO
 static int __init tsofifo_init(void){
    printk(KERN_INFO "TSOFIFO: Inicializando el TSOFIFO LKM\n");
+
+   //init de semaforos
+   sema_init(&d1SemBuff, 1);
+   sema_init(&d1SemTSOs, 1);
+   sema_init(&d2SemBuff, 1);
+   sema_init(&d2SemTSOs, 1);
+   sema_init(&d3SemBuff, 1);
+   sema_init(&d3SemTSOs, 1);
+   sema_init(&d4SemBuff, 1);
+   sema_init(&d4SemTSOs, 1);
 
    // Registar el major namber dinamicamente
    majorNumber = register_chrdev(0, DEVICE_NAME, &fops);
@@ -110,43 +136,146 @@ static int dev_open(struct inode *inodep, struct file *filep){
    if (minor == 0)
    //tsofifo0
    {
-
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
+      down(&d1SemTSOs);
+      if (tsofifo0 == 0)
+      {
+         printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
+         tsofifo0 = 1;
+      }
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: dispositivo en uso", minor);
+         up(&d1SemTSOs);
+         return -1;
+      }
+      up(&d1SemTSOs);
+
    } else if (minor == 1)
    //tsofifo1
    {
-
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
+      down(&d1SemTSOs);
+      if (tsofifo1 == 0)
+      {
+         printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
+         tsofifo1 = 1;
+      }
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: dispositivo en uso", minor);
+         up(&d1SemTSOs);
+         return -1;
+      }
+      up(&d1SemTSOs);
+
    } else if (minor == 2)
    //tsofifo2
    {
-
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
+      down(&d2SemTSOs);
+      if (tsofifo2 == 0)
+      {
+         printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
+         tsofifo2 = 1;
+      }
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: dispositivo en uso", minor);
+         up(&d2SemTSOs);
+         return -1;
+      }
+      up(&d2SemTSOs);
+
    } else if (minor == 3)
    //tsofifo3
    {
-
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
+      down(&d2SemTSOs);
+      if (tsofifo3 == 0)
+      {
+         printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
+         tsofifo3 = 1;
+      }
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: dispositivo en uso", minor);
+         up(&d2SemTSOs);
+         return -1;
+      }
+      up(&d2SemTSOs);
+
    } else if (minor == 4)
    //tsofifo4
    {
-
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
+      down(&d3SemTSOs);
+      if (tsofifo4 == 0)
+      {
+         printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
+         tsofifo4 = 1;
+      }
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: dispositivo en uso", minor);
+         up(&d3SemTSOs);
+         return -1;
+      }
+      up(&d3SemTSOs);
+
    } else if (minor == 5)
    //tsofifo5
    {
-
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
+      down(&d3SemTSOs);
+      if (tsofifo5 == 0)
+      {
+         printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
+         tsofifo5 = 1;
+      }
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: dispositivo en uso", minor);
+         up(&d3SemTSOs);
+         return -1;
+      }
+      up(&d3SemTSOs);
+
    } else if (minor == 6)
    //tsofifo6
    {
-
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
+      down(&d4SemTSOs);
+      if (tsofifo6 == 0)
+      {
+         printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
+         tsofifo6 = 1;
+      }
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: dispositivo en uso", minor);
+         up(&d4SemTSOs);
+         return -1;
+      }
+      up(&d4SemTSOs);
+
    } else if (minor == 7)
    //tsofifo7
    {
-
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
+      down(&d4SemTSOs);
+      if (tsofifo7 == 0)
+      {
+         printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
+         tsofifo7 = 1;
+      }
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: dispositivo en uso", minor);
+         up(&d4SemTSOs);
+         return -1;
+      }
+      up(&d4SemTSOs);
    }
 
    return 0;
@@ -156,6 +285,7 @@ static int dev_open(struct inode *inodep, struct file *filep){
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *offset){
 //CODIGO
    int error_count;
+   int to_read;
    int minor = MINOR(filep->f_inode->i_rdev);
 
    if (minor == 0)
@@ -167,21 +297,37 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    } else if (minor == 1)
    //tsofifo1
    {
-      printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO%d: read en dispositivo", minor);
       
-      //COPIAR AL USER SPACE
-      error_count = 0;
-      error_count = copy_to_user(buffer, d1Buff, d1Top);
-      //MANEJO DE ERROR
-      if (error_count==0)
-      {//success
-         printk(KERN_INFO "TSOFIFO: %d caracteres leidos\n", d1Top);
-         return (d1Top=0);
+      if (d2Len > 0)
+      {
+         if (len > d2Len)
+         {
+            to_read = d2Len;
+         }
+         else
+         {
+            to_read = len;
+         }
+         //COPIAR AL USER SPACE
+         error_count = 0;
+         error_count = copy_to_user(buffer, d2Buff, to_read);
+         //MANEJO DE ERROR
+         if (error_count==0)
+         {//success
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres leidos\n", d2Top, minor);
+            return (d2Top=0);
+         }
+         else 
+         {//error
+            printk(KERN_INFO "TSOFIFO%d: Fallo al leer %d caracteres\n", error_count, minor);
+            return -EFAULT;
+         }
       }
-      else 
-      {//error
-         printk(KERN_INFO "TSOFIFO: Fallo al leer %d caracteres\n", error_count);
-         return -EFAULT;
+      else
+      {
+         printk(KERN_INFO "TSOFIFO%d: buffer vacio", d2Top, minor);
+         return 0;
       }
    
    } else if (minor == 2)
@@ -353,43 +499,130 @@ static int dev_release(struct inode *inodep, struct file *filep){
    if (minor == 0)
    //tsofifo0
    {
-
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      
+      down(&d1SemTSOs);
+      tsofifo0 = 0;
+      if (tsofifo1 == 0)
+      {
+         d1Head = 0;
+         d1Len = 0;
+      }
+      up(&d1SemTSOs);
+
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+
    } else if (minor == 1)
    //tsofifo1
    {
-
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      
+      down(&d1SemTSOs);
+      tsofifo1 = 0;
+      if (tsofifo0 == 0)
+      {
+         d1Head = 0;
+         d1Len = 0;
+      }
+      up(&d1SemTSOs);
+
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+
    } else if (minor == 2)
    //tsofifo2
    {
-
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      
+      down(&d2SemTSOs);
+      tsofifo2 = 0;
+      if (tsofifo3 == 0)
+      {
+         d2Head = 0;
+         d2Len = 0;
+      }
+      up(&d2SemTSOs);
+
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+
    } else if (minor == 3)
    //tsofifo3
    {
-
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      
+      down(&d2SemTSOs);
+      tsofifo3 = 0;
+      if (tsofifo2 == 0)
+      {
+         d2Head = 0;
+         d2Len = 0;
+      }
+      up(&d2SemTSOs);
+
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+
    } else if (minor == 4)
    //tsofifo4
    {
-
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      
+      down(&d3SemTSOs);
+      tsofifo4 = 0;
+      if (tsofifo5 == 0)
+      {
+         d3Head = 0;
+         d3Len = 0;
+      }
+      up(&d3SemTSOs);
+
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+
    } else if (minor == 5)
    //tsofifo5
    {
-
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      
+      down(&d3SemTSOs);
+      tsofifo5 = 0;
+      if (tsofifo4 == 0)
+      {
+         d3Head = 0;
+         d3Len = 0;
+      }
+      up(&d3SemTSOs);
+
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+
    } else if (minor == 6)
    //tsofifo6
    {
-
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      
+      down(&d4SemTSOs);
+      tsofifo6 = 0;
+      if (tsofifo7 == 0)
+      {
+         d4Head = 0;
+         d4Len = 0;
+      }
+      up(&d4SemTSOs);
+
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+
    } else if (minor == 7)
    //tsofifo7
    {
-
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      
+      down(&d4SemTSOs);
+      tsofifo7 = 0;
+      if (tsofifo6 == 0)
+      {
+         d4Head = 0;
+         d4Len = 0;
+      }
+      up(&d4SemTSOs);
+
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
    }
    
    return 0;
@@ -397,3 +630,12 @@ static int dev_release(struct inode *inodep, struct file *filep){
 
 module_init(tsofifo_init);
 module_exit(tsofifo_exit);
+
+void normalize(int numbuff){
+   int i;
+   if (numbuff == 1)
+   {
+      i = d1Head;
+
+   }
+}  
