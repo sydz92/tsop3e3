@@ -10,34 +10,56 @@ static char receive[BUFFER_LENGTH];     ///< The receive buffer from the LKM
 
 int main(){
 
+   printf("Comienza el test...\n");
    int ret, fd;
+   char * dev;
    char stringToSend[BUFFER_LENGTH];
-   printf("Starting device test code example...\n");
-   fd = open("/dev/tsofifo5", O_RDWR);             // Open the device with read/write access
-   if (fd < 0){
-      perror("Failed to open the device...");
-      return errno;
-   }
 
-   printf("Type in a short string to send to the kernel module:\n");
-   scanf("%[^\n]%*c", stringToSend);                // Read in a string (with spaces)
-   printf("Writing message to the device [%s].\n", stringToSend);
-   ret = write(fd, stringToSend, strlen(stringToSend)); // Send the string to the LKM
-   if (ret < 0){
-      perror("Failed to write the message to the device.");
-      return errno;
-   }
+   int i = 0;
+   while(i<8)
+   {
+      
+      printf("Abrendo dispositvo %d...\n", i);      
+      sprintf (dev, "/dev/tsofifo%d", i);
+      fd = open(dev, O_RDWR);           
+      if (fd < 0)\
+      {
+         perror("Fallo a abrir el dispositvo...");
+         return errno;
+      }
+      i++;
 
-   printf("Press ENTER to read back from the device...\n");
-   getchar();
+      printf("Escriba el mensaje para enviar al dispositvo:\n");
+      scanf("%[^\n]%*c", stringToSend);                // Read in a string (with spaces)
+      printf("Envidndo el mensaje [%s] al dispositvo.\n", stringToSend);
+      ret = write(fd, stringToSend, strlen(stringToSend)); // Send the string to the LKM
+      if (ret < 0){
+         perror("Fallo al enviar el mensaje.");
+         return errno;
+      }
 
-   printf("Reading from the device...\n");
-   ret = read(fd, receive, BUFFER_LENGTH);        // Read the response from the LKM
-   if (ret < 0){
-      perror("Failed to read the message from the device.");
-      return errno;
+      printf("Abrendo dispositvo %d...\n", i);      
+      sprintf (dev, "/dev/tsofifo%d", i);
+      fd = open(dev, O_RDWR);           
+      if (fd < 0)\
+      {
+         perror("Fallo a abrir el dispositvo...");
+         return errno;
+      }
+      i++;
+
+      printf("Presionar ENTER parra leer el dispositvo...");
+      getchar();
+
+      printf("Leyendo el dispositvo...\n");
+      ret = read(fd, receive, BUFFER_LENGTH);        // Read the response from the LKM
+      if (ret < 0){
+         perror("Fallo al leer el dispositvo.");
+         return errno;
+      }
+      printf("El mensaje recibido es: [%s]\n\n\n", receive);
+      
    }
-   printf("The received message is: [%s]\n", receive);
-   printf("End of the program\n");
+   printf("Hasta pronto!\n");
    return 0;
 }

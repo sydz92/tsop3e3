@@ -598,7 +598,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    if (minor == 0)
    //tsofifo0
    {
-      printk(KERN_INFO "TSOFIFO%d: write en dispositivo", minor);
+      printk(KERN_INFO "TSOFIFO%d: write en dispositivo\n", minor);
 
       down(&d1SemBuff);
       while(1){
@@ -622,13 +622,13 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
                up(&d1SemBuffEmpty);
             d1Len+= to_write;
 
-            printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos", minor, to_write);
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos\n", minor, to_write);
             up(&d1SemBuff);
             return to_write;
          }
          else 
          {//el buffer esta lleno
-            printk(KERN_INFO "TSOFIFO%d: buffer lleno", minor);
+            printk(KERN_INFO "TSOFIFO%d: buffer lleno\n", minor);
             up(&d1SemBuff);
             down(&d1SemBuffFull);
             down(&d1SemBuff);
@@ -644,7 +644,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    } else if (minor == 2)
    //tsofifo2
    {
-      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d\n", minor);
 
       down(&d2SemBuff);
       while(1){
@@ -668,13 +668,13 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
                up(&d2SemBuffEmpty);
             d2Len+= to_write;
 
-            printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos", minor, to_write);
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos\n", minor, to_write);
             up(&d2SemBuff);
             return to_write;
          }
          else 
          {//el buffer esta lleno
-            printk(KERN_INFO "TSOFIFO%d: buffer lleno", minor);
+            printk(KERN_INFO "TSOFIFO%d: buffer lleno\n", minor);
             up(&d2SemBuff);
             down(&d2SemBuffFull);
             down(&d2SemBuff);
@@ -690,7 +690,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    } else if (minor == 4)
    //tsofifo4
    {
-      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d\n", minor);
 
       down(&d3SemBuff);
       while(1){
@@ -714,13 +714,13 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
                up(&d3SemBuffEmpty);
             d3Len+= to_write;
 
-            printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos", minor, to_write);
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos\n", minor, to_write);
             up(&d3SemBuff);
             return to_write;
          }
          else 
          {//el buffer esta lleno
-            printk(KERN_INFO "TSOFIFO%d: buffer lleno", minor);
+            printk(KERN_INFO "TSOFIFO%d: buffer lleno\n", minor);
             up(&d3SemBuff);
             down(&d2SemBuffFull);
             down(&d2SemBuff);
@@ -736,7 +736,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    } else if (minor == 6)
    //tsofifo6
    {
-      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d\n", minor);
 
       down(&d4SemBuff);
       while(1){
@@ -760,13 +760,13 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
                up(&d3SemBuffEmpty);
             d4Len+= to_write;
 
-            printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos", minor, to_write);
+            printk(KERN_INFO "TSOFIFO%d: %d caracteres recibidos\n", minor, to_write);
             up(&d4SemBuff);
             return to_write;
          }
          else 
          {//el buffer esta lleno
-            printk(KERN_INFO "TSOFIFO%d: buffer lleno", minor);
+            printk(KERN_INFO "TSOFIFO%d: buffer lleno\n", minor);
             up(&d4SemBuff);
             down(&d2SemBuffFull);
             down(&d2SemBuff);
@@ -792,7 +792,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
    if (minor == 0)
    //tsofifo0
    {
-      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
       down(&d1SemTSOs);
       tsofifo0 = 0;
@@ -803,14 +803,14 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d1SemTSOs);
       //Despierto al lector si esta dormido
-      down(&d1SemBuffEmpty);
+      up(&d1SemBuffEmpty);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
 
    } else if (minor == 1)
    //tsofifo1
    {
-      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
       down(&d1SemTSOs);
       tsofifo1 = 0;
@@ -821,12 +821,12 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d1SemTSOs);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
 
    } else if (minor == 2)
    //tsofifo2
    {
-      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
       down(&d2SemTSOs);
       tsofifo2 = 0;
@@ -837,14 +837,14 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d2SemTSOs);
       //Despierto al lector si esta dormido
-      down(&d2SemBuffEmpty);
+      up(&d2SemBuffEmpty);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
 
    } else if (minor == 3)
    //tsofifo3
    {
-      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
       down(&d2SemTSOs);
       tsofifo3 = 0;
@@ -855,12 +855,12 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d2SemTSOs);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
 
    } else if (minor == 4)
    //tsofifo4
    {
-      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
       down(&d3SemTSOs);
       tsofifo4 = 0;
@@ -871,14 +871,14 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d3SemTSOs);
       //Despierto al lector si esta dormido
-      down(&d3SemBuffEmpty);
+      up(&d3SemBuffEmpty);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
 
    } else if (minor == 5)
    //tsofifo5
    {
-      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
       down(&d3SemTSOs);
       tsofifo5 = 0;
@@ -889,12 +889,12 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d3SemTSOs);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
 
    } else if (minor == 6)
    //tsofifo6
    {
-      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
       down(&d4SemTSOs);
       tsofifo6 = 0;
@@ -905,14 +905,14 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d4SemTSOs);
       //Despierto al lector si esta dormido
-      down(&d4SemBuffEmpty);
+      up(&d4SemBuffEmpty);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
 
    } else if (minor == 7)
    //tsofifo7
    {
-      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d", minor);
+      printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
       down(&d4SemTSOs);
       tsofifo7 = 0;
@@ -923,7 +923,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d4SemTSOs);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente", minor);
+      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
    }
    
    return 0;
