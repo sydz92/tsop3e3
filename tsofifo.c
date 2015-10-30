@@ -157,7 +157,8 @@ static int dev_open(struct inode *inodep, struct file *filep){
    //tsofifo0
    {
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
-      down(&d1SemTSOs);
+      if (down_interruptible(&d1SemTSOs))
+        return -ERESTARTSYS;   
       if (tsofifo0 == 0)
       {
          printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
@@ -175,7 +176,8 @@ static int dev_open(struct inode *inodep, struct file *filep){
    //tsofifo1
    {
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
-      down(&d1SemTSOs);
+      if (down_interruptible(&d1SemTSOs))
+        return -ERESTARTSYS; 
       if (tsofifo1 == 0)
       {
          printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
@@ -193,7 +195,8 @@ static int dev_open(struct inode *inodep, struct file *filep){
    //tsofifo2
    {
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
-      down(&d2SemTSOs);
+      if (down_interruptible(&d2SemTSOs))
+        return -ERESTARTSYS; 
       if (tsofifo2 == 0)
       {
          printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
@@ -211,7 +214,8 @@ static int dev_open(struct inode *inodep, struct file *filep){
    //tsofifo3
    {
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
-      down(&d2SemTSOs);
+      if (down_interruptible(&d2SemTSOs))
+        return -ERESTARTSYS;
       if (tsofifo3 == 0)
       {
          printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
@@ -229,7 +233,8 @@ static int dev_open(struct inode *inodep, struct file *filep){
    //tsofifo4
    {
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
-      down(&d3SemTSOs);
+      if (down_interruptible(&d3SemTSOs))
+        return -ERESTARTSYS;
       if (tsofifo4 == 0)
       {
          printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
@@ -247,7 +252,8 @@ static int dev_open(struct inode *inodep, struct file *filep){
    //tsofifo5
    {
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
-      down(&d3SemTSOs);
+      if (down_interruptible(&d3SemTSOs))
+        return -ERESTARTSYS;
       if (tsofifo5 == 0)
       {
          printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
@@ -265,7 +271,8 @@ static int dev_open(struct inode *inodep, struct file *filep){
    //tsofifo6
    {
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
-      down(&d4SemTSOs);
+      if (down_interruptible(&d4SemTSOs))
+        return -ERESTARTSYS;
       if (tsofifo6 == 0)
       {
          printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
@@ -283,7 +290,8 @@ static int dev_open(struct inode *inodep, struct file *filep){
    //tsofifo7
    {
       printk(KERN_INFO "TSOFIFO: open en dispositivo tsofifo%d", minor);
-      down(&d4SemTSOs);
+      if (down_interruptible(&d4SemTSOs))
+        return -ERESTARTSYS;
       if (tsofifo7 == 0)
       {
          printk(KERN_INFO "TSOFIFO%d: abierto correctamente", minor);
@@ -319,7 +327,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    {
       printk(KERN_INFO "TSOFIFO%d: read en dispositivo", minor);
       
-      down(&d1SemBuff);
+      if (down_interruptible(&d1SemBuff))
+        return -ERESTARTSYS;
       while(1){
          if (d1Len > 0)
          {//Hay cosas en el buffer
@@ -363,7 +372,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
             printk(KERN_INFO "TSOFIFO%d: buffer vacio", minor);
             up(&d1SemBuff);
 
-            down(&d1SemTSOs);
+            if (down_interruptible(&d1SemTSOs))
+               return -ERESTARTSYS;
             if (tsofifo0 == 0){
                up(&d1SemTSOs);
                return 0;
@@ -371,8 +381,10 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
             else
             {
                up(&d1SemTSOs);
-               down(&d1SemBuffEmpty);
-               down(&d1SemBuff);
+               if (down_interruptible(&d1SemBuffEmpty))
+                  return -ERESTARTSYS;
+               if (down_interruptible(&d1SemBuff))
+                  return -ERESTARTSYS;
             }
          }
       }
@@ -388,7 +400,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    {
       printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", minor);
 
-      down(&d2SemBuff);
+      if (down_interruptible(&d2SemBuff))
+                  return -ERESTARTSYS;
       while(1){
          if (d2Len > 0)
          {//Hay cosas en el buffer
@@ -432,7 +445,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
             printk(KERN_INFO "TSOFIFO%d: buffer vacio", minor);
             up(&d2SemBuff);
 
-            down(&d2SemTSOs);
+            if (down_interruptible(&d2SemTSOs))
+                  return -ERESTARTSYS;
             if (tsofifo2 == 0){
                up(&d2SemTSOs);
                return 0;
@@ -440,8 +454,10 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
             else
             {
                up(&d2SemTSOs);
-               down(&d2SemBuffEmpty);
-               down(&d2SemBuff);
+               if (down_interruptible(&d2SemBuffEmpty))
+                  return -ERESTARTSYS;
+               if (down_interruptible(&d2SemBuff))
+                  return -ERESTARTSYS;
             }
          }
       }
@@ -457,7 +473,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    {
       printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", minor);
 
-      down(&d3SemBuff);
+      if (down_interruptible(&d3SemBuff))
+         return -ERESTARTSYS;
       while(1){
          if (d3Len > 0)
          {//Hay cosas en el buffer
@@ -501,7 +518,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
             printk(KERN_INFO "TSOFIFO%d: buffer vacio", minor);
             up(&d3SemBuff);
 
-            down(&d3SemTSOs);
+            if (down_interruptible(&d3SemTSOs))
+               return -ERESTARTSYS;
             if (tsofifo4 == 0){
                up(&d3SemTSOs);
                return 0;
@@ -509,8 +527,10 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
             else
             {
                up(&d3SemTSOs);
-               down(&d3SemBuffEmpty);
-               down(&d3SemBuff);
+               if (down_interruptible(&d3SemBuffEmpty))
+                  return -ERESTARTSYS;
+               if (down_interruptible(&d3SemBuff))
+                  return -ERESTARTSYS;
             }
          }
       }
@@ -526,7 +546,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
    {
       printk(KERN_INFO "TSOFIFO: read en dispositivo tsofifo%d", minor);
 
-      down(&d4SemBuff);
+      if (down_interruptible(&d4SemBuff))
+         return -ERESTARTSYS;
       while(1){
          if (d4Len > 0)
          {//Hay cosas en el buffer
@@ -570,7 +591,8 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
             printk(KERN_INFO "TSOFIFO%d: buffer vacio", minor);
             up(&d4SemBuff);
 
-            down(&d4SemTSOs);
+            if (down_interruptible(&d4SemTSOs))
+               return -ERESTARTSYS;
             if (tsofifo4 == 0){
                up(&d4SemTSOs);
                return 0;
@@ -578,8 +600,10 @@ static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *of
             else
             {
                up(&d4SemTSOs);
-               down(&d4SemBuffEmpty);
-               down(&d4SemBuff);
+               if (down_interruptible(&d4SemBuffEmpty))
+                  return -ERESTARTSYS;
+               if (down_interruptible(&d4SemBuff))
+                  return -ERESTARTSYS;
             }
          }
       }
@@ -600,7 +624,8 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    {
       printk(KERN_INFO "TSOFIFO%d: write en dispositivo\n", minor);
 
-      down(&d1SemBuff);
+      if (down_interruptible(&d1SemBuff))
+         return -ERESTARTSYS;
       while(1){
          if (d1Len < 4096)
          {//hay espacio en el buffer 
@@ -630,8 +655,10 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
          {//el buffer esta lleno
             printk(KERN_INFO "TSOFIFO%d: buffer lleno\n", minor);
             up(&d1SemBuff);
-            down(&d1SemBuffFull);
-            down(&d1SemBuff);
+            if (down_interruptible(&d1SemBuffFull))
+               return -ERESTARTSYS;
+            if (down_interruptible(&d1SemBuff))
+               return -ERESTARTSYS;
          }
       }
 
@@ -646,7 +673,8 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    {
       printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d\n", minor);
 
-      down(&d2SemBuff);
+      if (down_interruptible(&d2SemBuff))
+         return -ERESTARTSYS;
       while(1){
          if (d2Len < 4096)
          {//hay espacio en el buffer 
@@ -676,8 +704,10 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
          {//el buffer esta lleno
             printk(KERN_INFO "TSOFIFO%d: buffer lleno\n", minor);
             up(&d2SemBuff);
-            down(&d2SemBuffFull);
-            down(&d2SemBuff);
+            if (down_interruptible(&d2SemBuffFull))
+               return -ERESTARTSYS;
+            if (down_interruptible(&d2SemBuff))
+               return -ERESTARTSYS;
          }
       }
 
@@ -692,7 +722,8 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    {
       printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d\n", minor);
 
-      down(&d3SemBuff);
+      if (down_interruptible(&d3SemBuff))
+         return -ERESTARTSYS;
       while(1){
          if (d3Len < 4096)
          {//hay espacio en el buffer 
@@ -722,8 +753,10 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
          {//el buffer esta lleno
             printk(KERN_INFO "TSOFIFO%d: buffer lleno\n", minor);
             up(&d3SemBuff);
-            down(&d2SemBuffFull);
-            down(&d2SemBuff);
+            if (down_interruptible(&d3SemBuffFull))
+               return -ERESTARTSYS;
+            if (down_interruptible(&d3SemBuff))
+               return -ERESTARTSYS;
          }
       }
 
@@ -738,7 +771,8 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
    {
       printk(KERN_INFO "TSOFIFO: write en dispositivo tsofifo%d\n", minor);
 
-      down(&d4SemBuff);
+      if (down_interruptible(&d4SemBuff))
+         return -ERESTARTSYS;
       while(1){
          if (d4Len < 4096)
          {//hay espacio en el buffer 
@@ -768,8 +802,10 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
          {//el buffer esta lleno
             printk(KERN_INFO "TSOFIFO%d: buffer lleno\n", minor);
             up(&d4SemBuff);
-            down(&d2SemBuffFull);
-            down(&d2SemBuff);
+            if (down_interruptible(&d4SemBuffFull))
+               return -ERESTARTSYS;
+            if (down_interruptible(&d4SemBuff))
+               return -ERESTARTSYS;
          }
       }
 
@@ -794,7 +830,8 @@ static int dev_release(struct inode *inodep, struct file *filep){
    {
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
-      down(&d1SemTSOs);
+      if (down_interruptible(&d1SemTSOs))
+         return -ERESTARTSYS;
       tsofifo0 = 0;
       if (tsofifo1 == 0)
       {
@@ -812,7 +849,8 @@ static int dev_release(struct inode *inodep, struct file *filep){
    {
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
-      down(&d1SemTSOs);
+      if (down_interruptible(&d1SemTSOs))
+         return -ERESTARTSYS;
       tsofifo1 = 0;
       if (tsofifo0 == 0)
       {
@@ -828,7 +866,8 @@ static int dev_release(struct inode *inodep, struct file *filep){
    {
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
-      down(&d2SemTSOs);
+      if (down_interruptible(&d2SemTSOs))
+         return -ERESTARTSYS;
       tsofifo2 = 0;
       if (tsofifo3 == 0)
       {
@@ -846,7 +885,8 @@ static int dev_release(struct inode *inodep, struct file *filep){
    {
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
-      down(&d2SemTSOs);
+      if (down_interruptible(&d2SemTSOs))
+         return -ERESTARTSYS;
       tsofifo3 = 0;
       if (tsofifo2 == 0)
       {
@@ -862,7 +902,8 @@ static int dev_release(struct inode *inodep, struct file *filep){
    {
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
-      down(&d3SemTSOs);
+      if (down_interruptible(&d3SemTSOs))
+         return -ERESTARTSYS;
       tsofifo4 = 0;
       if (tsofifo5 == 0)
       {
@@ -880,7 +921,8 @@ static int dev_release(struct inode *inodep, struct file *filep){
    {
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
-      down(&d3SemTSOs);
+      if (down_interruptible(&d3SemTSOs))
+         return -ERESTARTSYS;
       tsofifo5 = 0;
       if (tsofifo4 == 0)
       {
@@ -896,7 +938,8 @@ static int dev_release(struct inode *inodep, struct file *filep){
    {
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
-      down(&d4SemTSOs);
+      if (down_interruptible(&d4SemTSOs))
+         return -ERESTARTSYS;
       tsofifo6 = 0;
       if (tsofifo7 == 0)
       {
@@ -914,7 +957,8 @@ static int dev_release(struct inode *inodep, struct file *filep){
    {
       printk(KERN_INFO "TSOFIFO: release en dispositivo tsofifo%d\n", minor);
       
-      down(&d4SemTSOs);
+      if (down_interruptible(&d4SemTSOs))
+         return -ERESTARTSYS;
       tsofifo7 = 0;
       if (tsofifo6 == 0)
       {
