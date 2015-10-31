@@ -18,7 +18,7 @@ MODULE_VERSION("1.0");
 
 //Estructura de datos del driver
 int i;
-static int    majorNumber;
+static unsigned int majorNumber;
 //dev1
 static char   d1Buff[4096];
 static short  d1Head = 0;
@@ -79,6 +79,8 @@ static struct file_operations fops =
    .release = dev_release,
 };
 
+module_param_named(major, majorNumber, int, 0);
+
 //INICIALIZACION DEL MODULO
 static int __init tsofifo_init(void){
    printk(KERN_INFO "TSOFIFO: Inicializando el TSOFIFO LKM\n");
@@ -104,13 +106,30 @@ static int __init tsofifo_init(void){
    sema_init(&d4SemBuffFull, 0);
    sema_init(&d4SemTSOs, 1);
 
-   // Registar el major namber dinamicamente
-   majorNumber = register_chrdev(0, DEVICE_NAME, &fops);
-   if (majorNumber<0){
-      printk(KERN_INFO "TSOFIFO fallo al registar el major number\n");
-      return majorNumber;
+   if (majorNumber != 0)
+   {
+      printk(KERN_INFO "TSOFIFO major number pasado como parametro %d\n", majorNumber);
+
+      // Registar el major namber dinamicamente
+      i = register_chrdev(majorNumber, DEVICE_NAME, &fops);
+      if (i<0){
+         printk(KERN_INFO "TSOFIFO fallo al registar el major number\n");
+         return majorNumber;
+      }
+      printk(KERN_INFO "TSOFIFO: registrado correctamente con major number %d\n", majorNumber);
    }
-   printk(KERN_INFO "TSOFIFO: registrado correctamente con major number %d\n", majorNumber);
+   else
+   {
+      printk(KERN_INFO "TSOFIFO major number asignado dinamicamente");
+
+      // Registar el major namber dinamicamente
+      majorNumber = register_chrdev(0, DEVICE_NAME, &fops);
+      if (majorNumber<0){
+         printk(KERN_INFO "TSOFIFO fallo al registar el major number\n");
+         return majorNumber;
+      }
+      printk(KERN_INFO "TSOFIFO: registrado correctamente con major number %d\n", majorNumber);
+   }
 
    //Registar el device class
    tsofifoClass = class_create(THIS_MODULE, CLASS_NAME);
@@ -842,7 +861,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       //Despierto al lector si esta dormido
       up(&d1SemBuffEmpty);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
+      printk(KERN_INFO "TSOFIFO%d: cerrado correctamente\n", minor);
 
    } else if (minor == 1)
    //tsofifo1
@@ -859,7 +878,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d1SemTSOs);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
+      printk(KERN_INFO "TSOFIFO%d: cerrado correctamente\n", minor);
 
    } else if (minor == 2)
    //tsofifo2
@@ -878,7 +897,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       //Despierto al lector si esta dormido
       up(&d2SemBuffEmpty);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
+      printk(KERN_INFO "TSOFIFO%d: cerrado correctamente\n", minor);
 
    } else if (minor == 3)
    //tsofifo3
@@ -895,7 +914,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d2SemTSOs);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
+      printk(KERN_INFO "TSOFIFO%d: cerrado correctamente\n", minor);
 
    } else if (minor == 4)
    //tsofifo4
@@ -914,7 +933,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       //Despierto al lector si esta dormido
       up(&d3SemBuffEmpty);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
+      printk(KERN_INFO "TSOFIFO%d: cerrado correctamente\n", minor);
 
    } else if (minor == 5)
    //tsofifo5
@@ -931,7 +950,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d3SemTSOs);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
+      printk(KERN_INFO "TSOFIFO%d: cerrado correctamente\n", minor);
 
    } else if (minor == 6)
    //tsofifo6
@@ -950,7 +969,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       //Despierto al lector si esta dormido
       up(&d4SemBuffEmpty);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
+      printk(KERN_INFO "TSOFIFO%d: cerrado correctamente\n", minor);
 
    } else if (minor == 7)
    //tsofifo7
@@ -967,7 +986,7 @@ static int dev_release(struct inode *inodep, struct file *filep){
       }
       up(&d4SemTSOs);
 
-      printk(KERN_INFO "TSOFIFO%d: carrado correctamente\n", minor);
+      printk(KERN_INFO "TSOFIFO%d: cerrado correctamente\n", minor);
    }
    
    return 0;
