@@ -21,7 +21,6 @@ int i;
 static unsigned int majorNumber;
 //dev1
 static char   d1Buff[4096];
-static short  d1Head = 0;
 static short  d1Len= 0;
 static short  tsofifo0= 0;
 static short  tsofifo1= 0;
@@ -31,7 +30,6 @@ static struct semaphore d1SemBuffFull;
 static struct semaphore d1SemTSOs;
 //dev2
 static char   d2Buff[4096];
-static short  d2Head = 0;
 static short  d2Len= 0;
 static short  tsofifo2= 0;
 static short  tsofifo3= 0;
@@ -41,7 +39,6 @@ static struct semaphore d2SemBuffFull;
 static struct semaphore d2SemTSOs;
 //dev3
 static char   d3Buff[4096];
-static short  d3Head = 0;
 static short  d3Len= 0;
 static short  tsofifo4= 0;
 static short  tsofifo5= 0;
@@ -51,7 +48,6 @@ static struct semaphore d3SemBuffFull;
 static struct semaphore d3SemTSOs;
 //dev4
 static char   d4Buff[4096];
-static short  d4Head = 0;
 static short  d4Len= 0;
 static short  tsofifo6= 0;
 static short  tsofifo7= 0;
@@ -854,7 +850,6 @@ static int dev_release(struct inode *inodep, struct file *filep){
       tsofifo0 = 0;
       if (tsofifo1 == 0)
       {
-         d1Head = 0;
          d1Len = 0;
       }
       up(&d1SemTSOs);
@@ -873,7 +868,6 @@ static int dev_release(struct inode *inodep, struct file *filep){
       tsofifo1 = 0;
       if (tsofifo0 == 0)
       {
-         d1Head = 0;
          d1Len = 0;
       }
       up(&d1SemTSOs);
@@ -890,7 +884,6 @@ static int dev_release(struct inode *inodep, struct file *filep){
       tsofifo2 = 0;
       if (tsofifo3 == 0)
       {
-         d2Head = 0;
          d2Len = 0;
       }
       up(&d2SemTSOs);
@@ -909,7 +902,6 @@ static int dev_release(struct inode *inodep, struct file *filep){
       tsofifo3 = 0;
       if (tsofifo2 == 0)
       {
-         d2Head = 0;
          d2Len = 0;
       }
       up(&d2SemTSOs);
@@ -926,7 +918,6 @@ static int dev_release(struct inode *inodep, struct file *filep){
       tsofifo4 = 0;
       if (tsofifo5 == 0)
       {
-         d3Head = 0;
          d3Len = 0;
       }
       up(&d3SemTSOs);
@@ -945,7 +936,6 @@ static int dev_release(struct inode *inodep, struct file *filep){
       tsofifo5 = 0;
       if (tsofifo4 == 0)
       {
-         d3Head = 0;
          d3Len = 0;
       }
       up(&d3SemTSOs);
@@ -962,7 +952,6 @@ static int dev_release(struct inode *inodep, struct file *filep){
       tsofifo6 = 0;
       if (tsofifo7 == 0)
       {
-         d4Head = 0;
          d4Len = 0;
       }
       up(&d4SemTSOs);
@@ -981,7 +970,6 @@ static int dev_release(struct inode *inodep, struct file *filep){
       tsofifo7 = 0;
       if (tsofifo6 == 0)
       {
-         d4Head = 0;
          d4Len = 0;
       }
       up(&d4SemTSOs);
